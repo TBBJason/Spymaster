@@ -1,11 +1,11 @@
 from google.cloud import vision
 import  io # image handling and file operations
 
-client = vision.ImageAnnotatorClient.from_service_account_file('gcp_key.json')
+
 
 class extract_text_from_image:
-    def __init__ (self, image_path, client=client):
-        self.client = client
+    def __init__ (self, image_path, APIkey):
+        self.client = vision.ImageAnnotatorClient.from_service_account_file(APIkey)
         self.image_path = image_path
         self.grid = []
 
@@ -13,7 +13,7 @@ class extract_text_from_image:
         with io.open(self.image_path, 'rb') as image_file:
             self.content = image_file.read() # this reads the image file in binary mode
         image = vision.Image(content=self.content) # this creates an Image object with the content
-        self.response = client.text_detection(image=image)
+        self.response = self.client.text_detection(image=image)
         return self.response
         
     def formulate_grid(self):
@@ -35,6 +35,7 @@ class extract_text_from_image:
 # grid = extract_text_from_image(image_path).formulate_grid()
 # grid.print_grid()
 if __name__ == "__main__":
+    APIkey = 'gcp_key.json'
     image_path = 'spymasterGridDiscord.png'
-    grid = extract_text_from_image(image_path=image_path).formulate_grid()
-    grid.print_grid()
+    extractor = extract_text_from_image(image_path=image_path, APIkey=APIkey).formulate_grid()
+    extractor.print_grid()
