@@ -1,7 +1,8 @@
 from google.cloud import vision
+import os
 import  io # image handling and file operations
-
-
+from vectors.calculate import calculator    
+from dotenv import load_dotenv, dotenv_values
 
 class extract_text_from_image:
     def __init__ (self, image_path, APIkey):
@@ -35,7 +36,15 @@ class extract_text_from_image:
 # grid = extract_text_from_image(image_path).formulate_grid()
 # grid.print_grid()
 if __name__ == "__main__":
-    APIkey = 'gcp_key.json'
-    image_path = 'spymasterGridDiscord.png'
-    extractor = extract_text_from_image(image_path=image_path, APIkey=APIkey).formulate_grid()
-    extractor.print_grid()
+    load_dotenv()
+    genAIAPIKey = os.getenv("MY_KEY")
+    # logic for extracting text from an image and calculating vectors
+    # APIkey = 'gcp_key.json'
+    # image_path = 'spymasterGridDiscord.png'
+    # extractor = extract_text_from_image(image_path=image_path, APIkey=APIkey).formulate_grid()
+    # extractor.print_grid()
+
+    
+    # print(genAIAPIKey)
+    # test = calculator(genAIAPIKey).vectorize_grid()
+    # test.print_vector_grid()
