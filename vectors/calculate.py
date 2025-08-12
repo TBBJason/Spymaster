@@ -1,4 +1,6 @@
 import google.generativeai as genai# need to import the google vector embeddings API
+from google.genai import types
+
 class calculator:
     def __init__(self, APIkey): #extractor, APIkey):
         # self.extractor = extractor
@@ -8,7 +10,6 @@ class calculator:
                         ['CYCLOPS', 'CASINO', 'TICK', 'EGYPT', 'CHAIR'],
                         ['BOMB', 'BELL', 'COCONUT', 'PEGASUS', 'GHOST']]   # extractor.grid 
         self.APIkey = APIkey
-        print(APIkey)
         genai.configure(api_key=self.APIkey)  # Initialize the gemini API with the API key
         self.best_words = []
         self.vector_grid = []
@@ -19,6 +20,7 @@ class calculator:
                 result = genai.embed_content(
                     model="models/embedding-001",
                     content=word,
+                    config=types.EmbedContentConfig(output_dimensionality=768),  # Specify the dimensionality of the embedding (makes it smaller than the default 3072 for efficiency)
                     task_type="retrieval_document"
                     )
                 vector_row.append(result['embedding'])
@@ -29,9 +31,9 @@ class calculator:
             print(row)
             
     def calculate(self, words):
-        # use the vectors to calculate the best words to respond
-        # compare vectors using cosine similarity
-        #calculate the best words to respond, where words is the number of words to respond
+        res = [""] * words
 
+
+        
         return []
 
