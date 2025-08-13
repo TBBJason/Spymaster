@@ -1,7 +1,7 @@
 import numpy as np
 from gensim.models import keyedvectors
 
-words = ['apple', 'banana', 'cherry', 'date', 'elderberry']
+favoured_words = ['apple', 'banana', 'cherry', 'date', 'elderberry']
 n = 3
 def test_func(words, n):
 
@@ -19,5 +19,7 @@ def backtrack(n, words, res, curr, idx):
         backtrack(n, words, res, curr + [words[i]], i + 1)
 
 
-test = test_func(words, n)
-print (len(test))
+test = test_func(favoured_words, n)
+print (len(test)) # should be len(words) choose n
+
+
