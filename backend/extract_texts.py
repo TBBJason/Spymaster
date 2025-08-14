@@ -33,15 +33,4 @@ class extract_text_from_image:
         for row in self.grid:
             print(row)
 
-# grid = extract_text_from_image(image_path).formulate_grid()
-# grid.print_grid()
-if __name__ == "__main__":
-    # logic for extracting text from an image and calculating vectors
-    # APIkey = 'gcp_key.json'
-    # image_path = 'spymasterGridDiscord.png'
-    # extractor = extract_text_from_image(image_path=image_path, APIkey=APIkey).formulate_grid()
-    # extractor.print_grid()
 
-
-    test = calculator()
-    test.bestWord(3)
