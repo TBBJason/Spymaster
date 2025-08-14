@@ -42,7 +42,6 @@ print (len(test)) # should be len(words) choose n
 
 def bestword(test):
     max = -1
-    best = None
     for words in test:
         res = get_median(words)
         print (words)
