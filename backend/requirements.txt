@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+numpy
+google-cloud-vision
+dotenv
+gensim
+scipy
