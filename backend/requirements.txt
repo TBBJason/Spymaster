@@ -3,6 +3,7 @@ uvicorn
 pydantic
 numpy
 google-cloud-vision
-dotenv
+python-dotenv
 gensim
 scipy
+python-multipart
