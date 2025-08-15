@@ -53,7 +53,6 @@ class calculator:
             else:
                 print(f"⚠️ '{word}' not in vocabulary")
                 return None, -1
-        # vectors = [self.model[word] for word in chosen_words]
         closest = np.mean(vectors, axis=0)
         candidates  = self.model.similar_by_vector(closest, topn=(1 + len(self.words))) # note that we want to have just enough to make sure we get a word that is not in the list
 
