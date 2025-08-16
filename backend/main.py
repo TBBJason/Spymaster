@@ -3,7 +3,6 @@ from extract_texts import extract_text_from_image
 from fastapi import FastAPI, UploadFile, File
 from calculate import calculator    
 import os
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
