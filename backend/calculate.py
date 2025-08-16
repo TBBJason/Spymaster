@@ -4,14 +4,9 @@ import numpy as np
 import gensim.downloader as api
 
 class calculator:
-    def __init__(self): #extractor, APIkey):
-        # self.extractor = extractor
+    def __init__(self, grid):
+        self.grid = grid
         self.model = api.load('glove-wiki-gigaword-100')
-        self.grid =  [['SNORKEL', 'PIANO', 'GRACE', 'SATELLITE', 'BARK'],
-                        ['BRUSH', 'GENIUS', 'ROME', 'THUMB', 'CHAINSAW'],
-                        ['ARMSTRONG', 'GRAVITY', 'SUB', 'SATURN', 'SUBMARINE'],
-                        ['CYCLOPS', 'CASINO', 'TICK', 'EGYPT', 'CHAIR'],
-                        ['BOMB', 'BELL', 'COCONUT', 'PEGASUS', 'GHOST']]   # extractor.grid 
         self.best = None
         self.vector_grid = []
         self.combinations = []
@@ -23,8 +18,8 @@ class calculator:
                 self.words.append(word)
         self.get_favoured_words()
     
-    def get_favoured_words(self):
-        self.favoured_words = ['BOMB', 'BELL', 'COCONUT', 'PEGASUS', 'GHOST']  # example words to be used in the calculation
+    # def get_favoured_words(self):
+    #     self.favoured_words = ['BOMB', 'BELL', 'COCONUT', 'PEGASUS', 'GHOST']  # example words to be used in the calculation
 
     def backtrack(self, n, words, res, curr, idx):
         if (curr is None):

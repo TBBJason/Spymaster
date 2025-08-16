@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv()
-
+grid = []
 app = FastAPI()
 
 origins = [
@@ -37,14 +37,22 @@ async def upload_image(file: UploadFile = File(...)):
     grid = text_extractor.extract(image_bytes)
 
     del image_bytes
+    grid = text_extractor.grid
     return {
+        "size" : "{}x{}".format(len(grid), len(grid[0]) if grid else 0),
         "grid": grid,
         "filename": file.filename,
         "message": "Image processed successfully",
-        "size" : "{}x{}".format(len(grid), len(grid[0]) if grid else 0)
             }
 
- 
+@app.get("/calculate-combinations")
+async def calculate_combinations(n: int):
+    calc = calculator(grid)
+    calc.get_favoured_words()
+    calc.get_combinations(n)
+    return {
+        "combinations": calc.combinations,
+        "message": "Combinations calculated successfully"
+    }
 if __name__ == "__main__":
-
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
