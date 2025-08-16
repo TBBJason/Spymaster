@@ -4,22 +4,18 @@ import numpy as np
 import gensim.downloader as api
 
 class calculator:
-    def __init__(self, grid):
+    def __init__(self, grid, favoured_words):
         self.grid = grid
         self.model = api.load('glove-wiki-gigaword-100')
         self.best = None
         self.vector_grid = []
         self.combinations = []
-        self.favoured_words = []
+        self.favoured_words = favoured_words
         self.target_words = []
         self.words = []
         for row in self.grid:
             for word in row:
                 self.words.append(word)
-        self.get_favoured_words()
-    
-    # def get_favoured_words(self):
-    #     self.favoured_words = ['BOMB', 'BELL', 'COCONUT', 'PEGASUS', 'GHOST']  # example words to be used in the calculation
 
     def backtrack(self, n, words, res, curr, idx):
         if (curr is None):
@@ -37,7 +33,6 @@ class calculator:
         curr = []
         self.backtrack(n, self.favoured_words, res, curr, 0)
         self.combinations = res
-        print(self.combinations)
         return
 
     def get_median(self, chosen_words):
@@ -57,7 +52,7 @@ class calculator:
                 break
         return candidates[0]
 
-    def bestWord(self, n = 3):
+    def bestWord(self, n):
         self.get_combinations(n)
         max = -1
         for chosen_words in self.combinations:
@@ -67,6 +62,3 @@ class calculator:
                 max = res[1]
                 self.best = res[0]
                 self.target_words = chosen_words
-
-        print(self.best, self.target_words)
-        return (self.best, self.target_words)

@@ -84,7 +84,7 @@ function UploadFile() {
           favoured_words: favouredWords.join(",")
         }
       });
-      setComboResults(res.data.combinations);
+      setComboResults(res.data);
     } catch (err) {
       setError("Failed to fetch combinations");
     }
@@ -110,7 +110,15 @@ function UploadFile() {
         >
           {isUploading ? "Processing..." : "Upload"}
         </button>
-        <button onClick={() => { setFile(null); setResult(null); setError(null); }} disabled={isUploading}>
+        <button 
+          onClick={() => { 
+            setFile(null); 
+            setResult(null); 
+            setError(null);
+            setComboResults(null);
+          }} 
+          disabled={isUploading}
+        >
           Clear
         </button>
       </div>
@@ -136,7 +144,7 @@ function UploadFile() {
                 type="number"
                 min="2"
                 value={comboSize}
-                onChange={(e) => setComboSize(e.target.value)}
+                onChange={(e) => setComboSize(parseInt(e.target.value) || 2)}
               />
             </label>
             <div style={{ marginTop: "10px" }}>
@@ -151,10 +159,49 @@ function UploadFile() {
 
           {comboResults && (
             <div style={{ marginTop: "20px" }}>
-              <h4>Combinations:</h4>
-              <pre style={{ background: "#f5f5f5", padding: "10px" }}>
-                {JSON.stringify(comboResults, null, 2)}
-              </pre>
+              {/* Best Word Highlight */}
+              <div style={{
+                padding: "15px",
+                marginBottom: "20px",
+                backgroundColor: "#e6f7ff",
+                border: "1px solid #91d5ff",
+                borderRadius: "8px",
+                textAlign: "center"
+              }}>
+                <h3 style={{ margin: 0, color: "#1890ff" }}>
+                  ⭐ Best Word: <span style={{ fontWeight: "bold" }}>{comboResults.bestWord}</span>
+                </h3>
+              </div>
+
+              {/* Combinations List - Safe rendering */}
+              {comboResults.target && comboResults.combinations.length > 0 ? (
+                <>
+                  <h4>Combinations:</h4>
+                  <ul style={{ listStyle: "none", padding: 0 }}>
+                    {comboResults.combinations.map((combo, idx) => (
+                      <li
+                        key={idx}
+                        style={{
+                          marginBottom: "10px",
+                          padding: "10px",
+                          backgroundColor: "#fafafa",
+                          border: "1px solid #ddd",
+                          borderRadius: "6px"
+                        }}
+                      >
+                        {combo.map((word, i) => (
+                          <span key={i} style={{ fontWeight: "bold", marginRight: "8px" }}>
+                            {word}
+                            {i < combo.length - 1 ? " + " : ""}
+                          </span>
+                        ))}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p>No combinations found</p>
+              )}
             </div>
           )}
         </div>

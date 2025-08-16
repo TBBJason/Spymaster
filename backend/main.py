@@ -1,12 +1,12 @@
 import uvicorn
 from extract_texts import extract_text_from_image
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Query
 from calculate import calculator    
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
-
+from typing import List 
 load_dotenv()
 grid = []
 app = FastAPI()
@@ -46,13 +46,13 @@ async def upload_image(file: UploadFile = File(...)):
             }
 
 @app.get("/calculate-combinations")
-async def calculate_combinations(n: int):
-    calc = calculator(grid)
-    calc.get_favoured_words()
-    calc.get_combinations(n)
+async def calculate_combinations(n: int, favoured_words: List[str] = Query(...)):
+    calc = calculator(grid, favoured_words)
+    calc.bestWord(n)
     return {
-        "combinations": calc.combinations,
-        "message": "Combinations calculated successfully"
+        "bestWord": calc.best,
+        "targets": calc.target_words,
+        "message": "everything calculated successfully"
     }
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
