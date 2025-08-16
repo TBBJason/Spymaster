@@ -14,6 +14,7 @@ function UploadFile() {
     const handleUpload = async () => {
         const formData = new FormData();
         formData.append("file", file);
+        
 
         try {
             setIsUploading(true);
