@@ -7,13 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
 
-# Load environment variables
 load_dotenv()
 
 app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 
 app.add_middleware(
@@ -25,8 +25,6 @@ app.add_middleware(
 )   
 
 APIKey = os.getenv("GOOGLE_VISION_API_KEY")
-print(APIKey)
-text_extractor = extract_text_from_image(APIkey=APIKey)
 
 @app.get("/")
 async def root():
@@ -34,20 +32,19 @@ async def root():
 
 @app.post("/process-image")
 async def upload_image(file: UploadFile = File(...)):
+    text_extractor = extract_text_from_image(APIkey=APIKey)
     image_bytes = await file.read()
     grid = text_extractor.extract(image_bytes)
 
+    del image_bytes
     return {
         "grid": grid,
-        "file": file.filename,
+        "filename": file.filename,
         "message": "Image processed successfully",
+        "size" : "{}x{}".format(len(grid), len(grid[0]) if grid else 0)
             }
 
-
+ 
 if __name__ == "__main__":
-    # logic for extracting text from an image and calculating vectors
-    # APIkey = 'gcp_key.json'
-    # image_path = 'spymasterGridDiscord.png'
-    # extractor = extract_text_from_image(image_path=image_path, APIkey=APIkey).formulate
-    
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
