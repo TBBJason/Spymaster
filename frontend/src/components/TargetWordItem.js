@@ -30,7 +30,6 @@ const TargetWordItem = ({ word, index, color, similarity }) => (
       <span style={{ fontWeight: "bold" }}>{word}</span>
     </div>
     
-    {/* Changed condition to check for null/undefined instead of falsy */}
     {similarity !== null && similarity !== undefined && (
       <div style={{
         backgroundColor: "#f0f0f0",

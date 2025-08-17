@@ -3,7 +3,7 @@ import React from 'react';
 const UploadSection = ({ 
   fileInputRef, 
   isUploading, 
-  file, // Add file to props destructuring
+  file, 
   handleUpload, 
   handleClear, 
   error,
@@ -26,7 +26,7 @@ const UploadSection = ({
     <div style={{ margin: "10px 0" }}>
       <button 
         onClick={handleUpload} 
-        disabled={isUploading || !file} // Now file is defined
+        disabled={isUploading || !file} 
         style={{ marginRight: "10px" }}
       >
         {isUploading ? "Processing..." : "Upload"}
