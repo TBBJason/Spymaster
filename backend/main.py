@@ -47,21 +47,14 @@ async def upload_image(file: UploadFile = File(...)):
 
 @app.get("/calculate-combinations")
 async def calculate_combinations(n: int, favoured_words: List[str] = Query(...)):
-    calc.favoured_words = [word.strip().lower() for word in favoured_words] # this is fine
-    calc.bestWord(n) # this should be fine as well, something is up with the calculate class
-    calc.grid = text_extractor.grid  # Ensure the grid is set before returning results
-    if not calc.grid:
-        return {
-            "error": "No grid available. Process an image first.",
-            "bestWord": None,
-            "targets": favoured_words,
-            "targets": []
-        }
-    
+    calc.favoured_words = [word.strip().lower() for word in favoured_words]
+    calc.bestWord(n)
+    print(calc.target_words_similarity)
     return {
         "bestWord": calc.best,
         "targets": calc.target_words,
         "combinations": calc.combinations,
+        "similarities": calc.target_words_similarity, 
         "message": "everything calculated successfully"
     }
 if __name__ == "__main__":
