@@ -45,7 +45,7 @@ async def upload_image(file: UploadFile = File(...)):
 
 @app.get("/calculate-combinations")
 async def calculate_combinations(n: int, favoured_words: List[str] = Query(...)):
-    calc.favoured_words = favoured_words # this is fine
+    calc.favoured_words = [word.strip().upper() for word in favoured_words] # this is fine
     calc.bestWord(n) # this should be fine as well, something is up with the calculate class
     if not text_extractor.grid:
         return {
