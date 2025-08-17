@@ -19,12 +19,14 @@ class extract_text_from_image:
         
     def _formulate_grid(self, response):
         curr = []
+        curr_grid = []
         texts = response.text_annotations
         for text in texts[1:]:
             curr.append(text.description)
             if (len(curr) == 5):
-                self.grid.append(curr)
+                curr_grid.append(curr)
                 curr = []
+        self.grid = curr_grid # doing this so that it doesn't accumulate everytime we upload an image
         return 
 
 

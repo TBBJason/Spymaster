@@ -13,7 +13,6 @@ function UploadFile() {
 
   const fileInputRef = useRef(null);
 
-  // Handle upload logic
   const handleUpload = async () => {
     if (!file) {
       setError("Please select a file first");
@@ -24,22 +23,22 @@ function UploadFile() {
       setIsUploading(true);
       setError(null);
       setResult(null);
+      setComboResults(null);
       
       const formData = new FormData();
       formData.append("file", file);
 
       const res = await api.post('/process-image', formData);
-
-      const formattedResult = {
-        filename: res.data.filename,
-        gridSize: res.data.grid_size,
-        grid: res.data.grid,
-        message: res.data.message
-      };
-
-      setResult(formattedResult);
-      // initialize cell states to "default"
-      setCellStates(formattedResult.grid.map(row => row.map(() => "default")));
+      setResult(res.data);
+      
+      // Initialize cell states
+      if (res.data.grid && res.data.grid.length > 0) {
+        setCellStates(
+          res.data.grid.map(row => 
+            row.map(() => "default")
+          )
+        );
+      }
     } catch (err) {
       const errorMsg = err.response?.data?.detail || 
                        err.response?.data?.message || 
@@ -63,30 +62,68 @@ function UploadFile() {
       return newStates;
     });
   };
-
   const handleCalculate = async (color) => {
-    if (!result) return;
+  if (!result || !result.grid) return;
 
-    // extract favoured words based on state
-    const favouredWords = [];
-    result.grid.forEach((row, rowIndex) => {
-      row.forEach((cell, colIndex) => {
-        if (cellStates[rowIndex][colIndex] === color) {
-          favouredWords.push(cell);
-        }
-      });
+  // Extract favoured words
+  const favouredWords = [];
+  result.grid.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (cellStates[rowIndex][colIndex] === color) {
+        favouredWords.push(cell);
+      }
     });
+  });
+  // const handleCalculate = async (color) => {
+  //   if (!result || !result.grid) {
+  //     setError("No grid data available");
+  //     return;
+  //   }
+
+  //   // Extract favoured words based on state
+  //   const favouredWords = [];
+  //   result.grid.forEach((row, rowIndex) => {
+  //     row.forEach((cell, colIndex) => {
+  //       if (cellStates[rowIndex][colIndex] === color) {
+  //         favouredWords.push(cell);
+  //       }
+  //     });
+  //   });
 
     try {
       const res = await api.get("/calculate-combinations", {
         params: {
           n: comboSize,
-          favoured_words: favouredWords.join(",")
+          favoured_words: favouredWords,   // <-- pass array directly
+        },
+        paramsSerializer: params => {
+          return Object.entries(params)
+            .map(([key, value]) =>
+              Array.isArray(value)
+                ? value.map(v => `${key}=${encodeURIComponent(v)}`).join("&")
+                : `${key}=${encodeURIComponent(value)}`
+            )
+            .join("&");
         }
       });
+      
       setComboResults(res.data);
     } catch (err) {
-      setError("Failed to fetch combinations");
+      const errorMsg = err.response?.data?.detail || 
+                       err.response?.data?.message || 
+                       "Calculation failed";
+      setError(errorMsg);
+    }
+  };
+
+  const handleClear = () => {
+    setFile(null);
+    setResult(null);
+    setError(null);
+    setComboResults(null);
+    setCellStates([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -98,7 +135,12 @@ function UploadFile() {
         type="file"
         ref={fileInputRef}
         accept="image/png, image/jpeg, image/jpg"
-        onChange={(e) => setFile(e.target.files[0])}
+        onChange={(e) => {
+          if (e.target.files.length > 0) {
+            setFile(e.target.files[0]);
+            setError(null);
+          }
+        }}
         disabled={isUploading}
       />
 
@@ -110,13 +152,9 @@ function UploadFile() {
         >
           {isUploading ? "Processing..." : "Upload"}
         </button>
+        
         <button 
-          onClick={() => { 
-            setFile(null); 
-            setResult(null); 
-            setError(null);
-            setComboResults(null);
-          }} 
+          onClick={handleClear} 
           disabled={isUploading}
         >
           Clear
@@ -125,11 +163,11 @@ function UploadFile() {
 
       {error && <div style={{ color: "red", margin: "10px 0" }}>{error}</div>}
 
-      {result && (
+      {result && result.grid && (
         <div>
           <h3>Processing Results</h3>
           <p><strong>Filename:</strong> {result.filename}</p>
-          <p><strong>Grid Size:</strong> {result.gridSize}</p>
+          <p><strong>Grid Size:</strong> {result.grid_size}</p>
 
           <GridDisplay 
             grid={result.grid} 
@@ -159,7 +197,6 @@ function UploadFile() {
 
           {comboResults && (
             <div style={{ marginTop: "20px" }}>
-              {/* Best Word Highlight */}
               <div style={{
                 padding: "15px",
                 marginBottom: "20px",
@@ -173,10 +210,9 @@ function UploadFile() {
                 </h3>
               </div>
 
-              {/* Combinations List - Safe rendering */}
-              {comboResults.target && comboResults.combinations.length > 0 ? (
+              {comboResults.combinations && comboResults.combinations.length > 0 ? (
                 <>
-                  <h4>Combinations:</h4>
+                  <h4>Best Combinations:</h4>
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     {comboResults.combinations.map((combo, idx) => (
                       <li

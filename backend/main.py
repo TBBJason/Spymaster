@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
 from typing import List 
 load_dotenv()
-grid = []
 app = FastAPI()
 
 origins = [
@@ -25,6 +24,8 @@ app.add_middleware(
 )   
 
 APIKey = os.getenv("GOOGLE_VISION_API_KEY")
+text_extractor = extract_text_from_image(APIkey=APIKey)
+calc = calculator(text_extractor)
 
 @app.get("/")
 async def root():
@@ -32,26 +33,32 @@ async def root():
 
 @app.post("/process-image")
 async def upload_image(file: UploadFile = File(...)):
-    text_extractor = extract_text_from_image(APIkey=APIKey)
     image_bytes = await file.read()
-    grid = text_extractor.extract(image_bytes)
-
+    text_extractor.extract(image_bytes)
     del image_bytes
-    grid = text_extractor.grid
     return {
-        "size" : "{}x{}".format(len(grid), len(grid[0]) if grid else 0),
-        "grid": grid,
+        "size" : "{}x{}".format(len(text_extractor.grid), len(text_extractor.grid[0]) if text_extractor.grid else 0),
+        "grid": text_extractor.grid,
         "filename": file.filename,
         "message": "Image processed successfully",
             }
 
 @app.get("/calculate-combinations")
 async def calculate_combinations(n: int, favoured_words: List[str] = Query(...)):
-    calc = calculator(grid, favoured_words)
-    calc.bestWord(n)
+    calc.favoured_words = favoured_words # this is fine
+    calc.bestWord(n) # this should be fine as well, something is up with the calculate class
+    if not text_extractor.grid:
+        return {
+            "error": "No grid available. Process an image first.",
+            "bestWord": None,
+            "targets": favoured_words,
+            "targets": []
+        }
+    
     return {
         "bestWord": calc.best,
         "targets": calc.target_words,
+        "combinations": calc.combinations,
         "message": "everything calculated successfully"
     }
 if __name__ == "__main__":

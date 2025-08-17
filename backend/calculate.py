@@ -2,15 +2,16 @@ import google.generativeai as genai# need to import the google vector embeddings
 from google.genai import types
 import numpy as np
 import gensim.downloader as api
+import logging
 
 class calculator:
-    def __init__(self, grid, favoured_words):
-        self.grid = grid
+    def __init__(self, extractor):
+        self.grid = extractor.grid
         self.model = api.load('glove-wiki-gigaword-100')
         self.best = None
         self.vector_grid = []
         self.combinations = []
-        self.favoured_words = favoured_words
+        self.favoured_words = None
         self.target_words = []
         self.words = []
         for row in self.grid:
@@ -29,6 +30,8 @@ class calculator:
             curr.pop() 
 
     def get_combinations(self, n):
+        # if not self.favoured_words:
+        #     logger.warning("No favoured words provided, using all words in the grid.")
         res = []
         curr = []
         self.backtrack(n, self.favoured_words, res, curr, 0)
