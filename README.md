@@ -13,3 +13,7 @@
 - submit the calculation, the output will show the best word and how similar it is to the target words. 
 - the calculation is based on all the possible combinations, and takes the best average of all of them.
 - blame your team if you can't win now
+
+### gensim
+- Since gensim needs scipy, make sure that your current python version is also compatible with scipy
+
