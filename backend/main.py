@@ -2,11 +2,13 @@ import uvicorn
 from extract_texts import extract_text_from_image
 from fastapi import FastAPI, UploadFile, File, Query
 from calculate import calculator    
-import os
+import os, json, base64
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values
 from typing import List 
+from google.oauth2 import service_account
+
 load_dotenv()
 app = FastAPI()
 
@@ -23,7 +25,12 @@ app.add_middleware(
     allow_headers=["*"],
 )   
 
-APIKey = os.getenv("GOOGLE_VISION_API_KEY")
+b64 = os.environ.get("GCP_SA_KEY_B64")
+if not b64:
+    raise RuntimeError("GCP_SA_KEY_B64 not set")
+sa_info = json.loads(base64.b64decode(b64).decode("utf-8"))
+APIKey = service_account.Credentials.from_service_account_info(sa_info)
+# APIKey = os.getenv("GOOGLE_VISION_API_KEY")
 text_extractor = extract_text_from_image(APIkey=APIKey)
 calc = calculator(text_extractor)
 
