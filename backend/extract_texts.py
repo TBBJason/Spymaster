@@ -1,7 +1,7 @@
 from google.cloud import vision
 import os
 import  io # image handling and file operations
-from calculate import calculator    
+from .calculate import calculator    
 
 
 class extract_text_from_image:

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+*.egg-info/
+dist/
+build/
+venv/
+
+# Environment / secrets
+.env
+gcp_key.json
+gcp_key.b64.txt
+
+# OS
+.DS_Store
+Thumbs.db

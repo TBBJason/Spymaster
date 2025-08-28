@@ -1,0 +1,8 @@
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+google-cloud-vision==3.10.2
+google-auth==2.40.3
+python-dotenv==1.1.1
+gensim==4.3.3
+scipy==1.13.1
+numpy==1.26.4

@@ -12,8 +12,8 @@ from google.oauth2 import service_account
 from google.cloud import vision
 
 # Import your custom modules
-from extract_texts import extract_text_from_image
-from calculate import calculator
+from .extract_texts import extract_text_from_image
+from .calculate import calculator
 
 
 load_dotenv()  
