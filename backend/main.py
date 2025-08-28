@@ -12,8 +12,8 @@ from google.oauth2 import service_account
 from google.cloud import vision
 
 # Import your custom modules
-from .extract_texts import extract_text_from_image
-from .calculate import calculator
+from extract_texts import extract_text_from_image
+from calculate import calculator
 
 
 load_dotenv()  
@@ -104,5 +104,5 @@ async def calculate_combinations(n: int, favoured_words: List[str] = Query(...))
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
 
