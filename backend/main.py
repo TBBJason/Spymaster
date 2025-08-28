@@ -21,7 +21,7 @@ load_dotenv()
 app = FastAPI()
 
 # --- CORS: use env var FRONTEND_ORIGINS (comma-separated), fallback to localhost for dev
-raw_origins = os.environ.get("https://spymaster-34mdruowu-jasons-projects-a8048af0.vercel.app", "http://localhost:3000,http://localhost:8000")
+raw_origins = os.environ.get("https://spymaster-8iyflyal3-jasons-projects-a8048af0.vercel.app/", "http://localhost:3000,http://localhost:8000")
 origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
