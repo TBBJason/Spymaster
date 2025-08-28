@@ -1,5 +1,3 @@
-import google.generativeai as genai
-from google.genai import types
 import numpy as np
 import gensim.downloader as api
 import logging
