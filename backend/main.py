@@ -21,11 +21,11 @@ load_dotenv()
 app = FastAPI()
 
 # --- CORS: use env var FRONTEND_ORIGINS (comma-separated), fallback to localhost for dev
-origins=[
-    "spymaster.vercel.app",
-    "https://spymaster-8iyflyal3-jasons-projects-a8048af0.vercel.app",
-    "https://localhost:8000"
-  ],  
+origins = [
+    "http://localhost:3000",   # local dev frontend (CRA default)
+    "https://spymaster.vercel.app",  # your production frontend (custom domain)
+    "https://spymaster-8iyflyal3-jasons-projects-a8048af0.vercel.app",  # example preview URL
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,7 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # --- Load GCP service account from base64 env var
 b64 = os.environ.get("GCP_SA_KEY_B64")
 if b64:
