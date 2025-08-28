@@ -4,7 +4,7 @@ google-cloud-vision==3.10.2
 google-auth==2.40.3
 python-dotenv==1.1.1
 gensim==4.3.3
-scipy==1.12.0 
+scipy>=1.6.0
 numpy
 python-multipart
 
