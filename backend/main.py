@@ -11,8 +11,10 @@ from dotenv import load_dotenv
 from google.oauth2 import service_account
 from google.cloud import vision
 
+# Import your custom modules
 from extract_texts import extract_text_from_image
 from calculate import calculator
+
 
 load_dotenv()  
 
@@ -32,13 +34,24 @@ app.add_middleware(
 
 # --- Load GCP service account from base64 env var
 b64 = os.environ.get("GCP_SA_KEY_B64")
-if not b64:
-    raise RuntimeError("GCP_SA_KEY_B64 env var not set. Add the base64-encoded service account JSON to Render.")
-
-try:
-    sa_info = json.loads(base64.b64decode(b64).decode("utf-8"))
-except Exception as e:
-    raise RuntimeError("Failed to decode/parse GCP_SA_KEY_B64") from e
+if b64:
+    # Production (Render) - use base64 env var
+    try:
+        sa_info = json.loads(base64.b64decode(b64).decode("utf-8"))
+    except Exception as e:
+        raise RuntimeError("Failed to decode/parse GCP_SA_KEY_B64") from e
+elif os.path.exists("gcp_key.json"):
+    # Development - use local file
+    try:
+        with open("gcp_key.json", "r") as f:
+            sa_info = json.load(f)
+    except Exception as e:
+        raise RuntimeError("Failed to load local gcp_key.json") from e
+else:
+    raise RuntimeError(
+        "GCP credentials not found. "
+        "Either set GCP_SA_KEY_B64 env var or place gcp_key.json in the project directory."
+    )
 
 # create credentials and a vision client (use this client in your extractor)
 credentials = service_account.Credentials.from_service_account_info(sa_info)
@@ -88,8 +101,8 @@ async def calculate_combinations(n: int, favoured_words: List[str] = Query(...))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Calculation failed: {e}")
 
-# --- For local dev only; Render will use your start command (uvicorn main:app ...)
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
+
