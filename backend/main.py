@@ -22,7 +22,7 @@ app = FastAPI()
 
 # --- CORS: use env var FRONTEND_ORIGINS (comma-separated), fallback to localhost for dev
 origins=[
-    "https://spymaster.vercel.app",
+    "spymaster.vercel.app",
     "https://spymaster-8iyflyal3-jasons-projects-a8048af0.vercel.app",
     "https://localhost:8000"
   ],  
