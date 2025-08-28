@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import api from './api';
 import UploadSection from './components/UploadSection';
 import GridSection from './components/GridSection';
@@ -16,6 +16,20 @@ function UploadFile() {
   const [activeColor, setActiveColor] = useState(null);
 
   const fileInputRef = useRef(null);
+
+  // Run on mount — test API connection and log API URL
+  useEffect(() => {
+    console.log("API URL:", process.env.REACT_APP_API_URL);
+    const testConnection = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/test`);
+        console.log("Connection test:", response);
+      } catch (error) {
+        console.error("Connection failed:", error);
+      }
+    };
+    testConnection();
+  }, []);
 
   const handleUpload = async () => {
     if (!file) {
@@ -154,19 +168,5 @@ function UploadFile() {
     </div>
   );
 }
-// In your App.js or main component
-console.log("API URL:", process.env.REACT_APP_API_URL);
 
-// Test the connection on component mount
-useEffect(() => {
-  const testConnection = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/test`);
-      console.log("Connection test:", response);
-    } catch (error) {
-      console.error("Connection failed:", error);
-    }
-  };
-  testConnection();
-}, []);
 export default UploadFile;

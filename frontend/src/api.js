@@ -9,22 +9,9 @@ const api = axios.create({
   baseURL: API_BASE_URL, // Use the variable here instead of hardcoding
   timeout: 10000, // Add a timeout to prevent hanging requests
   headers: {
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 });
-
-// Add a response interceptor to handle common errors
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      console.error('Unauthorized access - redirect to login');
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default api;
 
