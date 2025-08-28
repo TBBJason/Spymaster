@@ -100,6 +100,11 @@ async def calculate_combinations(n: int, favoured_words: List[str] = Query(...))
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Calculation failed: {e}")
+    
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "message": "Server is running"}
+
 
 if __name__ == "__main__":
     import uvicorn
