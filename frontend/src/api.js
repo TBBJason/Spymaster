@@ -12,6 +12,8 @@ const api = axios.create({
     Accept: 'application/json',
   },
 });
+delete api.defaults.headers.common["Content-Type"];
+delete api.defaults.headers.post["Content-Type"];
 
 export default api;
 
