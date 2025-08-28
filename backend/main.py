@@ -24,12 +24,12 @@ app = FastAPI()
 origins=[
     "https://spymaster.vercel.app",
     "https://spymaster-8iyflyal3-jasons-projects-a8048af0.vercel.app",
-    "localhost:8000"
+    "https://localhost:8000"
   ],  
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
