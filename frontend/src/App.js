@@ -154,5 +154,19 @@ function UploadFile() {
     </div>
   );
 }
+// In your App.js or main component
+console.log("API URL:", process.env.REACT_APP_API_URL);
 
+// Test the connection on component mount
+useEffect(() => {
+  const testConnection = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/test`);
+      console.log("Connection test:", response);
+    } catch (error) {
+      console.error("Connection failed:", error);
+    }
+  };
+  testConnection();
+}, []);
 export default UploadFile;
