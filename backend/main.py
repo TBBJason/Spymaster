@@ -1,37 +1,50 @@
-import uvicorn
-from extract_texts import extract_text_from_image
-from fastapi import FastAPI, UploadFile, File, Query
-from calculate import calculator    
-import os, json, base64
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from dotenv import load_dotenv, dotenv_values
-from typing import List 
-from google.oauth2 import service_account
+import os
+import json
+import base64
+from typing import List
 
-load_dotenv()
+from fastapi import FastAPI, UploadFile, File, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+# Google client libs
+from google.oauth2 import service_account
+from google.cloud import vision
+
+from extract_texts import extract_text_from_image
+from calculate import calculator
+
+load_dotenv()  
+
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-]
+# --- CORS: use env var FRONTEND_ORIGINS (comma-separated), fallback to localhost for dev
+raw_origins = os.environ.get("FRONTEND_ORIGINS", "http://localhost:3000,http://localhost:8000")
+origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins, 
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)   
+)
 
+# --- Load GCP service account from base64 env var
 b64 = os.environ.get("GCP_SA_KEY_B64")
 if not b64:
-    raise RuntimeError("GCP_SA_KEY_B64 not set")
-sa_info = json.loads(base64.b64decode(b64).decode("utf-8"))
-APIKey = service_account.Credentials.from_service_account_info(sa_info)
-# APIKey = os.getenv("GOOGLE_VISION_API_KEY")
-text_extractor = extract_text_from_image(APIkey=APIKey)
+    raise RuntimeError("GCP_SA_KEY_B64 env var not set. Add the base64-encoded service account JSON to Render.")
+
+try:
+    sa_info = json.loads(base64.b64decode(b64).decode("utf-8"))
+except Exception as e:
+    raise RuntimeError("Failed to decode/parse GCP_SA_KEY_B64") from e
+
+# create credentials and a vision client (use this client in your extractor)
+credentials = service_account.Credentials.from_service_account_info(sa_info)
+vision_client = vision.ImageAnnotatorClient(credentials=credentials)
+
+text_extractor = extract_text_from_image(client=vision_client)
 calc = calculator(text_extractor)
 
 @app.get("/")
@@ -40,29 +53,43 @@ async def root():
 
 @app.post("/process-image")
 async def upload_image(file: UploadFile = File(...)):
-    image_bytes = await file.read()
-    text_extractor.extract(image_bytes)
-    print(text_extractor.grid)
-    calc.grid = text_extractor.grid
-    del image_bytes
-    return {
-        "size" : "{}x{}".format(len(text_extractor.grid), len(text_extractor.grid[0]) if text_extractor.grid else 0),
-        "grid": text_extractor.grid,
-        "filename": file.filename,
-        "message": "Image processed successfully",
-            }
+    # read bytes
+    try:
+        image_bytes = await file.read()
+        # call your extractor - assume it populates text_extractor.grid
+        text_extractor.extract(image_bytes)
+        if not getattr(text_extractor, "grid", None):
+            raise HTTPException(status_code=500, detail="No grid detected in image")
+        # update calculator
+        calc.grid = text_extractor.grid
+        # return a sanitized response
+        return {
+            "size": "{}x{}".format(len(text_extractor.grid), len(text_extractor.grid[0]) if text_extractor.grid else 0),
+            "grid": text_extractor.grid,
+            "filename": file.filename,
+            "message": "Image processed successfully",
+        }
+    except Exception as e:
+        # log error to stdout/stderr (Render will capture logs)
+        raise HTTPException(status_code=500, detail=f"Image processing failed: {e}")
 
 @app.get("/calculate-combinations")
 async def calculate_combinations(n: int, favoured_words: List[str] = Query(...)):
-    calc.favoured_words = [word.strip().lower() for word in favoured_words]
-    calc.bestWord(n)
-    print(calc.target_words_similarity)
-    return {
-        "bestWord": calc.best,
-        "targets": calc.target_words,
-        "combinations": calc.combinations,
-        "similarities": calc.target_words_similarity, 
-        "message": "everything calculated successfully"
-    }
+    try:
+        calc.favoured_words = [word.strip().lower() for word in favoured_words]
+        calc.bestWord(n)
+        return {
+            "bestWord": calc.best,
+            "targets": calc.target_words,
+            "combinations": calc.combinations,
+            "similarities": calc.target_words_similarity,
+            "message": "Everything calculated successfully",
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Calculation failed: {e}")
+
+# --- For local dev only; Render will use your start command (uvicorn main:app ...)
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

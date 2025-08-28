@@ -5,8 +5,9 @@ from calculate import calculator
 
 
 class extract_text_from_image:
-    def __init__ (self, APIkey : str):
-        self.client = vision.ImageAnnotatorClient.from_service_account_file(APIkey)
+    def __init__ (self, client):
+        # self.client = vision.ImageAnnotatorClient.from_service_account_file(APIkey)
+        self.client = client
         self.grid = []
 
     def extract(self, image_bytes: bytes) -> list:
