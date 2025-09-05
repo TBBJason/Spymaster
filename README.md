@@ -1,6 +1,18 @@
-# Spymaster
+# Spymaster: FastAPI + google-cloud-vision + gensim 
+## Vercel + Render
+### Setup
+- Due to Render sleeping after 15 minutes of activity, we'll need to wake up our backend before we can use it:
+- https://spymaster.onrender.com
+- Once loaded, the vercel link will work:
+- https://spymaster.vercel.app/
+- Under the images folder are pictures of a Spymaster grid, in case you don't have any readily available.
 
-## FastAPI + google-cloud-vision + gensim 
+
+
+
+
+
+## Local Environment:
 
 ### Setup
 - create a .env
